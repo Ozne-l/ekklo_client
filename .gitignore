@@ -1,0 +1,12 @@
+# https://dart.dev/tools/pub/private-files
+.dart_tool/
+pubspec.lock
+
+# Local credentials and sessions - never commit
+.env
+.ekklo_tokens.json
+
+# Raw traffic captures contain passwords and tokens
+*.flow
+*.har
+captures/
