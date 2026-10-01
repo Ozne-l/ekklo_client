@@ -1,0 +1,215 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:ekklo_client/src/auth/token_store.dart';
+import 'package:ekklo_client/src/auth/tokens.dart';
+import 'package:ekklo_client/src/decoding.dart';
+import 'package:ekklo_client/src/exceptions/auth_failure.dart';
+import 'package:ekklo_client/src/exceptions/ekklo_exception.dart';
+import 'package:ekklo_client/src/http_method.dart';
+import 'package:ekklo_client/src/requests/error_response.dart';
+import 'package:ekklo_client/src/requests/login_query.dart';
+import 'package:ekklo_client/src/requests/login_request.dart';
+import 'package:ekklo_client/src/requests/refresh_request.dart';
+import 'package:ekklo_client/src/requests/token_response.dart';
+import 'package:http/http.dart' as http;
+
+final class EkkloTransport {
+  EkkloTransport({
+    required this._httpClient,
+    required this._tokenStore,
+    required this._baseUri,
+    required this._userAgent,
+    required this._clock,
+  });
+
+  static const _loginPath = '/api/v1/auth/login';
+  static const _refreshPath = '/api/v1/auth/login/refresh_token';
+  static const _refreshMargin = Duration(minutes: 1);
+
+  final http.Client _httpClient;
+  final EkkloTokenStore _tokenStore;
+  final Uri _baseUri;
+  final String _userAgent;
+  final DateTime Function() _clock;
+  Future<EkkloTokens>? _refreshing;
+
+  Future<void> login({required String email, required String password}) async {
+    final exchange = await _send(
+      HttpMethod.post,
+      _loginPath,
+      query: const LoginQuery().toMap(),
+      body: LoginRequest(email: email, password: password).toMap(),
+    );
+    switch (exchange.response.statusCode) {
+      case 401 || 403:
+        throw EkkloAuthException(
+          EkkloAuthFailure.invalidCredentials,
+          _errorMessages(exchange),
+        );
+    }
+    await _tokenStore.write(
+      EkkloTokensMapper.fromMap(asMap(_decodeOrThrow(exchange))),
+    );
+  }
+
+  Future<Object?> request(
+    HttpMethod method,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+  }) async {
+    final tokens = await _freshTokens();
+    final exchange = await _send(
+      method,
+      path,
+      query: query,
+      body: body,
+      accessToken: tokens.accessToken,
+    );
+    return switch (exchange.response.statusCode) {
+      401 => _retryWithRefreshedSession(
+        tokens,
+        method,
+        path,
+        query: query,
+        body: body,
+      ),
+      _ => _decodeOrThrow(exchange),
+    };
+  }
+
+  Future<Object?> _retryWithRefreshedSession(
+    EkkloTokens rejected,
+    HttpMethod method,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+  }) async {
+    final tokens = await _refresh(rejected);
+    final exchange = await _send(
+      method,
+      path,
+      query: query,
+      body: body,
+      accessToken: tokens.accessToken,
+    );
+    switch (exchange.response.statusCode) {
+      case 401:
+        await _tokenStore.clear();
+        throw EkkloAuthException(
+          EkkloAuthFailure.sessionExpired,
+          _errorMessages(exchange),
+        );
+    }
+    return _decodeOrThrow(exchange);
+  }
+
+  Future<EkkloTokens> _freshTokens() async {
+    final tokens = await _tokenStore.read();
+    if (tokens == null) {
+      throw const EkkloAuthException(EkkloAuthFailure.notSignedIn);
+    }
+    final expiresAt = tokens.accessTokenExpiresAt;
+    final expiring =
+        expiresAt != null && !_clock().add(_refreshMargin).isBefore(expiresAt);
+    return expiring ? _refresh(tokens) : tokens;
+  }
+
+  Future<EkkloTokens> _refresh(EkkloTokens stale) =>
+      _refreshing ??= _doRefresh(stale).whenComplete(() => _refreshing = null);
+
+  Future<EkkloTokens> _doRefresh(EkkloTokens stale) async {
+    final stored = await _tokenStore.read();
+    if (stored != null && stored.accessToken != stale.accessToken) {
+      return stored;
+    }
+    final exchange = await _send(
+      HttpMethod.post,
+      _refreshPath,
+      body: RefreshRequest(refreshToken: stale.refreshToken).toMap(),
+    );
+    switch (exchange.response.statusCode) {
+      case 400 || 401 || 403:
+        await _tokenStore.clear();
+        throw EkkloAuthException(
+          EkkloAuthFailure.sessionExpired,
+          _errorMessages(exchange),
+        );
+    }
+    final refreshed = TokenResponseMapper.fromMap(
+      asMap(_decodeOrThrow(exchange)),
+    );
+    final tokens = EkkloTokens(
+      accessToken: refreshed.accessToken,
+      refreshToken: refreshed.refreshToken ?? stale.refreshToken,
+    );
+    await _tokenStore.write(tokens);
+    return tokens;
+  }
+
+  Future<_Exchange> _send(
+    HttpMethod method,
+    String path, {
+    Map<String, dynamic>? query,
+    Object? body,
+    String? accessToken,
+  }) async {
+    final request =
+        http.Request(
+            method.verb,
+            _baseUri.replace(
+              path: path,
+              queryParameters: query?.map(
+                (key, value) => MapEntry(key, '$value'),
+              ),
+            ),
+          )
+          ..headers.addAll({
+            'accept': 'application/json',
+            'user-agent': _userAgent,
+            if (accessToken != null) 'authorization': 'Bearer $accessToken',
+          });
+    if (body != null) {
+      request
+        ..headers['content-type'] = 'application/json'
+        ..body = jsonEncode(body);
+    }
+    return (
+      request: request,
+      response: await http.Response.fromStream(
+        await _httpClient.send(request),
+      ),
+    );
+  }
+
+  Object? _decodeOrThrow(_Exchange exchange) {
+    final (:request, :response) = exchange;
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw EkkloApiException(
+        method: request.method,
+        uri: request.url,
+        statusCode: response.statusCode,
+        errors: _errorMessages(exchange),
+      );
+    }
+    return response.body.isEmpty ? null : jsonDecode(response.body);
+  }
+
+  List<String> _errorMessages(_Exchange exchange) {
+    final body = exchange.response.body;
+    final raw = body.isEmpty ? const <String>[] : [body];
+    try {
+      return switch (jsonDecode(body)) {
+        final Map<String, dynamic> json => ErrorResponseMapper.fromMap(
+          json,
+        ).messages,
+        _ => raw,
+      };
+    } on FormatException {
+      return raw;
+    }
+  }
+}
+
+typedef _Exchange = ({http.Request request, http.Response response});
