@@ -1,0 +1,69 @@
+[
+  {
+    "revision": 3,
+    "id": "00000000-0000-4000-8000-0000000000m1",
+    "created_at": "2026-10-01T13:21:21.016646+02:00",
+    "updated_at": "2026-10-01T14:56:20.689892+02:00",
+    "user_id": "00000000-0000-4000-8000-0000000000aa",
+    "date": "2026-10-01T14:00:00+02:00",
+    "name": "Petit déjeuner",
+    "order": 0,
+    "satiety_level": null,
+    "photo_url": "",
+    "description": "",
+    "daily_meal_items": [
+      {
+        "id": "00000000-0000-4000-8000-0000000000i1",
+        "created_at": "2026-10-01T14:56:20.698325+02:00",
+        "updated_at": "2026-10-01T14:56:20.693868+02:00",
+        "item_type": "food",
+        "food_id": "00000000-0000-4000-8000-000000000001",
+        "food": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "name": "Riz thaï ou basmati, cru",
+          "portion": 100,
+          "quantity_type": "grams",
+          "calories": 353,
+          "carbs": 77.8,
+          "fats": 0.84,
+          "proteins": 8.06,
+          "fiber": 0.92,
+          "sugar": 0.17,
+          "sodium": 6.39,
+          "brands": "",
+          "category": "grains",
+          "code": "9119",
+          "nutriscore_grade": "",
+          "food_units": []
+        },
+        "recipe_id": null,
+        "recipe": {"id": "", "name": "", "coach_id": ""},
+        "quantity": 225,
+        "quantity_type": "grams"
+      },
+      {
+        "id": "00000000-0000-4000-8000-0000000000i2",
+        "item_type": "recipe",
+        "food_id": "",
+        "food": {
+          "id": "",
+          "name": "",
+          "portion": 0,
+          "quantity_type": "",
+          "calories": 0,
+          "carbs": 0,
+          "fats": 0,
+          "proteins": 0,
+          "fiber": 0,
+          "sugar": 0,
+          "sodium": 0,
+          "category": "",
+          "food_units": null
+        },
+        "recipe_id": "00000000-0000-4000-8000-0000000000r1",
+        "quantity": 1,
+        "quantity_type": "portion"
+      }
+    ]
+  }
+]
