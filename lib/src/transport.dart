@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/src/auth/token_store.dart';
 import 'package:ekklo_client/src/auth/tokens.dart';
 import 'package:ekklo_client/src/decoding.dart';
@@ -49,13 +50,14 @@ final class EkkloTransport {
         );
     }
     await _tokenStore.write(
-      EkkloTokensMapper.fromMap(asMap(_decodeOrThrow(exchange))),
+      _decodeJson(exchange, mapped(EkkloTokensMapper.fromMap)),
     );
   }
 
-  Future<Object?> request(
+  Future<T> request<T>(
     HttpMethod method,
-    String path, {
+    String path,
+    T Function(Object? json) decode, {
     Map<String, dynamic>? query,
     Object? body,
   }) async {
@@ -67,19 +69,20 @@ final class EkkloTransport {
       body: body,
       accessToken: tokens.accessToken,
     );
-    return switch (exchange.response.statusCode) {
-      401 => _retryWithRefreshedSession(
+    final accepted = switch (exchange.response.statusCode) {
+      401 => await _retryWithRefreshedSession(
         tokens,
         method,
         path,
         query: query,
         body: body,
       ),
-      _ => _decodeOrThrow(exchange),
+      _ => exchange,
     };
+    return _decodeJson(accepted, decode);
   }
 
-  Future<Object?> _retryWithRefreshedSession(
+  Future<_Exchange> _retryWithRefreshedSession(
     EkkloTokens rejected,
     HttpMethod method,
     String path, {
@@ -102,7 +105,7 @@ final class EkkloTransport {
           _errorMessages(exchange),
         );
     }
-    return _decodeOrThrow(exchange);
+    return exchange;
   }
 
   Future<EkkloTokens> _freshTokens() async {
@@ -137,8 +140,9 @@ final class EkkloTransport {
           _errorMessages(exchange),
         );
     }
-    final refreshed = TokenResponseMapper.fromMap(
-      asMap(_decodeOrThrow(exchange)),
+    final refreshed = _decodeJson(
+      exchange,
+      mapped(TokenResponseMapper.fromMap),
     );
     final tokens = EkkloTokens(
       accessToken: refreshed.accessToken,
@@ -175,15 +179,23 @@ final class EkkloTransport {
         ..headers['content-type'] = 'application/json'
         ..body = jsonEncode(body);
     }
-    return (
-      request: request,
-      response: await http.Response.fromStream(
-        await _httpClient.send(request),
-      ),
-    );
+    try {
+      return (
+        request: request,
+        response: await http.Response.fromStream(
+          await _httpClient.send(request),
+        ),
+      );
+    } on http.ClientException catch (error) {
+      throw EkkloNetworkException(
+        method: request.method,
+        uri: request.url,
+        errors: [error.message],
+      );
+    }
   }
 
-  Object? _decodeOrThrow(_Exchange exchange) {
+  T _decodeJson<T>(_Exchange exchange, T Function(Object? json) decode) {
     final (:request, :response) = exchange;
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw EkkloApiException(
@@ -193,8 +205,24 @@ final class EkkloTransport {
         errors: _errorMessages(exchange),
       );
     }
-    return response.body.isEmpty ? null : jsonDecode(response.body);
+    try {
+      return decode(response.body.isEmpty ? null : jsonDecode(response.body));
+    } on FormatException catch (error) {
+      throw _unexpected(exchange, error.message);
+    } on MapperException catch (error) {
+      throw _unexpected(exchange, error.message);
+    }
   }
+
+  static EkkloUnexpectedResponseException _unexpected(
+    _Exchange exchange,
+    String reason,
+  ) => EkkloUnexpectedResponseException(
+    method: exchange.request.method,
+    uri: exchange.request.url,
+    statusCode: exchange.response.statusCode,
+    errors: [reason],
+  );
 
   List<String> _errorMessages(_Exchange exchange) {
     final body = exchange.response.body;

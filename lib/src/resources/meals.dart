@@ -20,24 +20,19 @@ final class EkkloMeals {
 
   final EkkloTransport _transport;
 
-  Future<List<EkkloDailyMeal>> forDate(DateTime date) async => decodeList(
-    await _transport.request(
-      HttpMethod.get,
-      _dailyMeals,
-      query: DailyMealsQuery(date: formatEkkloDate(date)).toMap(),
-    ),
-    EkkloDailyMealMapper.fromMap,
+  Future<List<EkkloDailyMeal>> forDate(DateTime date) => _transport.request(
+    HttpMethod.get,
+    _dailyMeals,
+    listOf(EkkloDailyMealMapper.fromMap),
+    query: DailyMealsQuery(date: formatEkkloDate(date)).toMap(),
   );
 
-  Future<EkkloMealHistoryPage> history({int page = 1, int limit = 20}) async =>
-      EkkloMealHistoryPageMapper.fromMap(
-        asMap(
-          await _transport.request(
-            HttpMethod.get,
-            '$_dailyMeals/history',
-            query: MealHistoryQuery(page: page, limit: limit).toMap(),
-          ),
-        ),
+  Future<EkkloMealHistoryPage> history({int page = 1, int limit = 20}) =>
+      _transport.request(
+        HttpMethod.get,
+        '$_dailyMeals/history',
+        mapped(EkkloMealHistoryPageMapper.fromMap),
+        query: MealHistoryQuery(page: page, limit: limit).toMap(),
       );
 
   Future<EkkloDailyMeal> appendItems({
@@ -45,39 +40,33 @@ final class EkkloMeals {
     required String name,
     required List<EkkloMealItemDraft> items,
     int? order,
-  }) async => EkkloDailyMealMapper.fromMap(
-    asMap(
-      await _transport.request(
-        HttpMethod.post,
-        _dailyMeals,
-        body: AddMealItemsRequest(
-          date: formatEkkloDate(date),
-          name: name,
-          order: order,
-          dailyMealItems: items,
-        ).toMap(),
-      ),
-    ),
+  }) => _transport.request(
+    HttpMethod.post,
+    _dailyMeals,
+    mapped(EkkloDailyMealMapper.fromMap),
+    body: AddMealItemsRequest(
+      date: formatEkkloDate(date),
+      name: name,
+      order: order,
+      dailyMealItems: items,
+    ).toMap(),
   );
 
   Future<EkkloDailyMeal> setManualMacros(
     EkkloDailyMeal meal,
     EkkloMacros macros,
-  ) async => EkkloDailyMealMapper.fromMap(
-    asMap(
-      await _transport.request(
-        HttpMethod.put,
-        '$_dailyMeals/${meal.id}',
-        body: ManualMacrosRequest(
-          date: formatEkkloDate(meal.date),
-          name: meal.name,
-          manualCalories: macros.calories,
-          manualProteins: macros.proteins,
-          manualCarbs: macros.carbs,
-          manualFats: macros.fats,
-        ).toMap(),
-      ),
-    ),
+  ) => _transport.request(
+    HttpMethod.put,
+    '$_dailyMeals/${meal.id}',
+    mapped(EkkloDailyMealMapper.fromMap),
+    body: ManualMacrosRequest(
+      date: formatEkkloDate(meal.date),
+      name: meal.name,
+      manualCalories: macros.calories,
+      manualProteins: macros.proteins,
+      manualCarbs: macros.carbs,
+      manualFats: macros.fats,
+    ).toMap(),
   );
 
   Future<EkkloDailyMealItem> updateItemQuantity({
@@ -86,26 +75,24 @@ final class EkkloMeals {
     required double quantity,
     EkkloQuantityType? quantityType,
     int? expectedRevision,
-  }) async => EkkloDailyMealItemMapper.fromMap(
-    asMap(
-      await _transport.request(
-        HttpMethod.put,
-        '$_dailyMeals/$mealId/items/$itemId',
-        body: ItemQuantityRequest(
-          quantity: quantity,
-          quantityType: quantityType,
-          expectedRevision: expectedRevision,
-        ).toMap(),
-      ),
-    ),
+  }) => _transport.request(
+    HttpMethod.put,
+    '$_dailyMeals/$mealId/items/$itemId',
+    mapped(EkkloDailyMealItemMapper.fromMap),
+    body: ItemQuantityRequest(
+      quantity: quantity,
+      quantityType: quantityType,
+      expectedRevision: expectedRevision,
+    ).toMap(),
   );
 
   Future<void> removeItem({required String mealId, required String itemId}) =>
       _transport.request(
         HttpMethod.delete,
         '$_dailyMeals/$mealId/items/$itemId',
+        ignoreBody,
       );
 
   Future<void> delete(String mealId) =>
-      _transport.request(HttpMethod.delete, '$_dailyMeals/$mealId');
+      _transport.request(HttpMethod.delete, '$_dailyMeals/$mealId', ignoreBody);
 }

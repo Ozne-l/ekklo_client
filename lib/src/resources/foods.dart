@@ -24,22 +24,22 @@ final class EkkloFoods {
     EkkloLanguage? language,
     EkkloFoodOwner? owner,
     bool? verifiedOnly,
-  }) async => decodeList(
-    await _transport.request(
-      HttpMethod.get,
-      '$_foodItems/search',
-      query: FoodSearchQuery(
-        query: query,
-        language: language,
-        owner: owner,
-        verifiedOnly: verifiedOnly,
-      ).toMap(),
-    ),
-    EkkloFoodMapper.fromMap,
+  }) => _transport.request(
+    HttpMethod.get,
+    '$_foodItems/search',
+    listOf(EkkloFoodMapper.fromMap),
+    query: FoodSearchQuery(
+      query: query,
+      language: language,
+      owner: owner,
+      verifiedOnly: verifiedOnly,
+    ).toMap(),
   );
 
-  Future<EkkloFood> byId(String id) async => EkkloFoodMapper.fromMap(
-    asMap(await _transport.request(HttpMethod.get, '$_foodItems/$id')),
+  Future<EkkloFood> byId(String id) => _transport.request(
+    HttpMethod.get,
+    '$_foodItems/$id',
+    mapped(EkkloFoodMapper.fromMap),
   );
 
   Future<List<EkkloFood>> recent({int limit = 20}) async =>
@@ -48,44 +48,38 @@ final class EkkloFoods {
   Future<List<EkkloFood>> frequent({int limit = 20}) async =>
       (await _userFoods(UserFoodsType.frequent, limit)).frequent ?? const [];
 
-  Future<List<EkkloFood>> favorites() async => decodeList(
-    await _transport.request(HttpMethod.get, _favorites),
-    EkkloFoodMapper.fromMap,
+  Future<List<EkkloFood>> favorites() => _transport.request(
+    HttpMethod.get,
+    _favorites,
+    listOf(EkkloFoodMapper.fromMap),
   );
 
-  Future<EkkloFood> createOwn(EkkloFoodDraft draft) async =>
-      EkkloFoodMapper.fromMap(
-        asMap(
-          await _transport.request(
-            HttpMethod.post,
-            _clientFoodItems,
-            body: draft.toMap(),
-          ),
-        ),
+  Future<EkkloFood> createOwn(EkkloFoodDraft draft) => _transport.request(
+    HttpMethod.post,
+    _clientFoodItems,
+    mapped(EkkloFoodMapper.fromMap),
+    body: draft.toMap(),
+  );
+
+  Future<EkkloFood> updateOwn(String id, EkkloFoodDraft draft) =>
+      _transport.request(
+        HttpMethod.put,
+        '$_clientFoodItems/$id',
+        mapped(EkkloFoodMapper.fromMap),
+        body: draft.toMap(),
       );
 
-  Future<EkkloFood> updateOwn(String id, EkkloFoodDraft draft) async =>
-      EkkloFoodMapper.fromMap(
-        asMap(
-          await _transport.request(
-            HttpMethod.put,
-            '$_clientFoodItems/$id',
-            body: draft.toMap(),
-          ),
-        ),
-      );
+  Future<void> deleteOwn(String id) => _transport.request(
+    HttpMethod.delete,
+    '$_clientFoodItems/$id',
+    ignoreBody,
+  );
 
-  Future<void> deleteOwn(String id) =>
-      _transport.request(HttpMethod.delete, '$_clientFoodItems/$id');
-
-  Future<UserFoodsResponse> _userFoods(UserFoodsType type, int limit) async =>
-      UserFoodsResponseMapper.fromMap(
-        asMap(
-          await _transport.request(
-            HttpMethod.get,
-            '$_foodItems/user',
-            query: UserFoodsQuery(type: type, limit: limit).toMap(),
-          ),
-        ),
+  Future<UserFoodsResponse> _userFoods(UserFoodsType type, int limit) =>
+      _transport.request(
+        HttpMethod.get,
+        '$_foodItems/user',
+        mapped(UserFoodsResponseMapper.fromMap),
+        query: UserFoodsQuery(type: type, limit: limit).toMap(),
       );
 }

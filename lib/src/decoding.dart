@@ -7,6 +7,18 @@ List<T> decodeList<T>(
   for (final item in json as List<Object?>? ?? const []) fromMap(asMap(item)),
 ];
 
+T Function(Object? json) mapped<T>(
+  T Function(Map<String, dynamic> map) fromMap,
+) =>
+    (json) => fromMap(asMap(json));
+
+List<T> Function(Object? json) listOf<T>(
+  T Function(Map<String, dynamic> map) fromMap,
+) =>
+    (json) => decodeList(json, fromMap);
+
+void ignoreBody(Object? json) {}
+
 Map<String, dynamic> asMap(Object? json) => switch (json) {
   final Map<String, dynamic> map => map,
   _ => throw MapperException.unexpectedType(

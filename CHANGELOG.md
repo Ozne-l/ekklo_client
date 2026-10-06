@@ -1,3 +1,9 @@
+## Unreleased
+
+- Every failure is now an `EkkloException`. New: `EkkloNetworkException` (was a
+  raw `http.ClientException`) and `EkkloUnexpectedResponseException` (was a
+  `FormatException` or `MapperException`).
+
 ## 0.1.0
 
 - Client-account login with automatic token refresh.

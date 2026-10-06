@@ -17,6 +17,8 @@ class EkkloExceptionMapper extends ClassMapperBase<EkkloException> {
       MapperContainer.globals.use(_instance = EkkloExceptionMapper._());
       EkkloAuthExceptionMapper.ensureInitialized();
       EkkloApiExceptionMapper.ensureInitialized();
+      EkkloNetworkExceptionMapper.ensureInitialized();
+      EkkloUnexpectedResponseExceptionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -415,5 +417,382 @@ class _EkkloApiExceptionCopyWithImpl<$R, $Out>
   EkkloApiExceptionCopyWith<$R2, EkkloApiException, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _EkkloApiExceptionCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class EkkloNetworkExceptionMapper
+    extends SubClassMapperBase<EkkloNetworkException> {
+  EkkloNetworkExceptionMapper._();
+
+  static EkkloNetworkExceptionMapper? _instance;
+  static EkkloNetworkExceptionMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = EkkloNetworkExceptionMapper._());
+      EkkloExceptionMapper.ensureInitialized().addSubMapper(_instance!);
+      MapperContainer.globals.useAll([UriMapper()]);
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'EkkloNetworkException';
+
+  static String _$method(EkkloNetworkException v) => v.method;
+  static const Field<EkkloNetworkException, String> _f$method = Field(
+    'method',
+    _$method,
+  );
+  static Uri _$uri(EkkloNetworkException v) => v.uri;
+  static const Field<EkkloNetworkException, Uri> _f$uri = Field('uri', _$uri);
+  static List<String> _$errors(EkkloNetworkException v) => v.errors;
+  static const Field<EkkloNetworkException, List<String>> _f$errors = Field(
+    'errors',
+    _$errors,
+    opt: true,
+    def: const [],
+  );
+
+  @override
+  final MappableFields<EkkloNetworkException> fields = const {
+    #method: _f$method,
+    #uri: _f$uri,
+    #errors: _f$errors,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'kind';
+  @override
+  final dynamic discriminatorValue = 'EkkloNetworkException';
+  @override
+  late final ClassMapperBase superMapper =
+      EkkloExceptionMapper.ensureInitialized();
+
+  static EkkloNetworkException _instantiate(DecodingData data) {
+    return EkkloNetworkException(
+      method: data.dec(_f$method),
+      uri: data.dec(_f$uri),
+      errors: data.dec(_f$errors),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static EkkloNetworkException fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<EkkloNetworkException>(map);
+  }
+
+  static EkkloNetworkException fromJson(String json) {
+    return ensureInitialized().decodeJson<EkkloNetworkException>(json);
+  }
+}
+
+mixin EkkloNetworkExceptionMappable {
+  String toJson() {
+    return EkkloNetworkExceptionMapper.ensureInitialized()
+        .encodeJson<EkkloNetworkException>(this as EkkloNetworkException);
+  }
+
+  Map<String, dynamic> toMap() {
+    return EkkloNetworkExceptionMapper.ensureInitialized()
+        .encodeMap<EkkloNetworkException>(this as EkkloNetworkException);
+  }
+
+  EkkloNetworkExceptionCopyWith<
+    EkkloNetworkException,
+    EkkloNetworkException,
+    EkkloNetworkException
+  >
+  get copyWith =>
+      _EkkloNetworkExceptionCopyWithImpl<
+        EkkloNetworkException,
+        EkkloNetworkException
+      >(this as EkkloNetworkException, $identity, $identity);
+  @override
+  String toString() {
+    return EkkloNetworkExceptionMapper.ensureInitialized().stringifyValue(
+      this as EkkloNetworkException,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return EkkloNetworkExceptionMapper.ensureInitialized().equalsValue(
+      this as EkkloNetworkException,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return EkkloNetworkExceptionMapper.ensureInitialized().hashValue(
+      this as EkkloNetworkException,
+    );
+  }
+}
+
+extension EkkloNetworkExceptionValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, EkkloNetworkException, $Out> {
+  EkkloNetworkExceptionCopyWith<$R, EkkloNetworkException, $Out>
+  get $asEkkloNetworkException => $base.as(
+    (v, t, t2) => _EkkloNetworkExceptionCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class EkkloNetworkExceptionCopyWith<
+  $R,
+  $In extends EkkloNetworkException,
+  $Out
+>
+    implements EkkloExceptionCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get errors;
+  @override
+  $R call({String? method, Uri? uri, List<String>? errors});
+  EkkloNetworkExceptionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _EkkloNetworkExceptionCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, EkkloNetworkException, $Out>
+    implements EkkloNetworkExceptionCopyWith<$R, EkkloNetworkException, $Out> {
+  _EkkloNetworkExceptionCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<EkkloNetworkException> $mapper =
+      EkkloNetworkExceptionMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get errors =>
+      ListCopyWith(
+        $value.errors,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(errors: v),
+      );
+  @override
+  $R call({String? method, Uri? uri, List<String>? errors}) => $apply(
+    FieldCopyWithData({
+      if (method != null) #method: method,
+      if (uri != null) #uri: uri,
+      if (errors != null) #errors: errors,
+    }),
+  );
+  @override
+  EkkloNetworkException $make(CopyWithData data) => EkkloNetworkException(
+    method: data.get(#method, or: $value.method),
+    uri: data.get(#uri, or: $value.uri),
+    errors: data.get(#errors, or: $value.errors),
+  );
+
+  @override
+  EkkloNetworkExceptionCopyWith<$R2, EkkloNetworkException, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _EkkloNetworkExceptionCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class EkkloUnexpectedResponseExceptionMapper
+    extends SubClassMapperBase<EkkloUnexpectedResponseException> {
+  EkkloUnexpectedResponseExceptionMapper._();
+
+  static EkkloUnexpectedResponseExceptionMapper? _instance;
+  static EkkloUnexpectedResponseExceptionMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(
+        _instance = EkkloUnexpectedResponseExceptionMapper._(),
+      );
+      EkkloExceptionMapper.ensureInitialized().addSubMapper(_instance!);
+      MapperContainer.globals.useAll([UriMapper()]);
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'EkkloUnexpectedResponseException';
+
+  static String _$method(EkkloUnexpectedResponseException v) => v.method;
+  static const Field<EkkloUnexpectedResponseException, String> _f$method =
+      Field('method', _$method);
+  static Uri _$uri(EkkloUnexpectedResponseException v) => v.uri;
+  static const Field<EkkloUnexpectedResponseException, Uri> _f$uri = Field(
+    'uri',
+    _$uri,
+  );
+  static int _$statusCode(EkkloUnexpectedResponseException v) => v.statusCode;
+  static const Field<EkkloUnexpectedResponseException, int> _f$statusCode =
+      Field('statusCode', _$statusCode, key: r'status_code');
+  static List<String> _$errors(EkkloUnexpectedResponseException v) => v.errors;
+  static const Field<EkkloUnexpectedResponseException, List<String>> _f$errors =
+      Field('errors', _$errors, opt: true, def: const []);
+
+  @override
+  final MappableFields<EkkloUnexpectedResponseException> fields = const {
+    #method: _f$method,
+    #uri: _f$uri,
+    #statusCode: _f$statusCode,
+    #errors: _f$errors,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'kind';
+  @override
+  final dynamic discriminatorValue = 'EkkloUnexpectedResponseException';
+  @override
+  late final ClassMapperBase superMapper =
+      EkkloExceptionMapper.ensureInitialized();
+
+  static EkkloUnexpectedResponseException _instantiate(DecodingData data) {
+    return EkkloUnexpectedResponseException(
+      method: data.dec(_f$method),
+      uri: data.dec(_f$uri),
+      statusCode: data.dec(_f$statusCode),
+      errors: data.dec(_f$errors),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static EkkloUnexpectedResponseException fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<EkkloUnexpectedResponseException>(map);
+  }
+
+  static EkkloUnexpectedResponseException fromJson(String json) {
+    return ensureInitialized().decodeJson<EkkloUnexpectedResponseException>(
+      json,
+    );
+  }
+}
+
+mixin EkkloUnexpectedResponseExceptionMappable {
+  String toJson() {
+    return EkkloUnexpectedResponseExceptionMapper.ensureInitialized()
+        .encodeJson<EkkloUnexpectedResponseException>(
+          this as EkkloUnexpectedResponseException,
+        );
+  }
+
+  Map<String, dynamic> toMap() {
+    return EkkloUnexpectedResponseExceptionMapper.ensureInitialized()
+        .encodeMap<EkkloUnexpectedResponseException>(
+          this as EkkloUnexpectedResponseException,
+        );
+  }
+
+  EkkloUnexpectedResponseExceptionCopyWith<
+    EkkloUnexpectedResponseException,
+    EkkloUnexpectedResponseException,
+    EkkloUnexpectedResponseException
+  >
+  get copyWith =>
+      _EkkloUnexpectedResponseExceptionCopyWithImpl<
+        EkkloUnexpectedResponseException,
+        EkkloUnexpectedResponseException
+      >(this as EkkloUnexpectedResponseException, $identity, $identity);
+  @override
+  String toString() {
+    return EkkloUnexpectedResponseExceptionMapper.ensureInitialized()
+        .stringifyValue(this as EkkloUnexpectedResponseException);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return EkkloUnexpectedResponseExceptionMapper.ensureInitialized()
+        .equalsValue(this as EkkloUnexpectedResponseException, other);
+  }
+
+  @override
+  int get hashCode {
+    return EkkloUnexpectedResponseExceptionMapper.ensureInitialized().hashValue(
+      this as EkkloUnexpectedResponseException,
+    );
+  }
+}
+
+extension EkkloUnexpectedResponseExceptionValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, EkkloUnexpectedResponseException, $Out> {
+  EkkloUnexpectedResponseExceptionCopyWith<
+    $R,
+    EkkloUnexpectedResponseException,
+    $Out
+  >
+  get $asEkkloUnexpectedResponseException => $base.as(
+    (v, t, t2) =>
+        _EkkloUnexpectedResponseExceptionCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class EkkloUnexpectedResponseExceptionCopyWith<
+  $R,
+  $In extends EkkloUnexpectedResponseException,
+  $Out
+>
+    implements EkkloExceptionCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get errors;
+  @override
+  $R call({String? method, Uri? uri, int? statusCode, List<String>? errors});
+  EkkloUnexpectedResponseExceptionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _EkkloUnexpectedResponseExceptionCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, EkkloUnexpectedResponseException, $Out>
+    implements
+        EkkloUnexpectedResponseExceptionCopyWith<
+          $R,
+          EkkloUnexpectedResponseException,
+          $Out
+        > {
+  _EkkloUnexpectedResponseExceptionCopyWithImpl(
+    super.value,
+    super.then,
+    super.then2,
+  );
+
+  @override
+  late final ClassMapperBase<EkkloUnexpectedResponseException> $mapper =
+      EkkloUnexpectedResponseExceptionMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get errors =>
+      ListCopyWith(
+        $value.errors,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(errors: v),
+      );
+  @override
+  $R call({String? method, Uri? uri, int? statusCode, List<String>? errors}) =>
+      $apply(
+        FieldCopyWithData({
+          if (method != null) #method: method,
+          if (uri != null) #uri: uri,
+          if (statusCode != null) #statusCode: statusCode,
+          if (errors != null) #errors: errors,
+        }),
+      );
+  @override
+  EkkloUnexpectedResponseException $make(CopyWithData data) =>
+      EkkloUnexpectedResponseException(
+        method: data.get(#method, or: $value.method),
+        uri: data.get(#uri, or: $value.uri),
+        statusCode: data.get(#statusCode, or: $value.statusCode),
+        errors: data.get(#errors, or: $value.errors),
+      );
+
+  @override
+  EkkloUnexpectedResponseExceptionCopyWith<
+    $R2,
+    EkkloUnexpectedResponseException,
+    $Out2
+  >
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _EkkloUnexpectedResponseExceptionCopyWithImpl<$R2, $Out2>(
+        $value,
+        $cast,
+        t,
+      );
 }
 

@@ -33,3 +33,31 @@ final class EkkloApiException extends EkkloException
   final Uri uri;
   final int statusCode;
 }
+
+@MappableClass(includeCustomMappers: [UriMapper()])
+final class EkkloNetworkException extends EkkloException
+    with EkkloNetworkExceptionMappable {
+  const EkkloNetworkException({
+    required this.method,
+    required this.uri,
+    List<String> errors = const [],
+  }) : super(errors);
+
+  final String method;
+  final Uri uri;
+}
+
+@MappableClass(includeCustomMappers: [UriMapper()])
+final class EkkloUnexpectedResponseException extends EkkloException
+    with EkkloUnexpectedResponseExceptionMappable {
+  const EkkloUnexpectedResponseException({
+    required this.method,
+    required this.uri,
+    required this.statusCode,
+    List<String> errors = const [],
+  }) : super(errors);
+
+  final String method;
+  final Uri uri;
+  final int statusCode;
+}

@@ -11,12 +11,10 @@ final class EkkloNutritionPlans {
 
   final EkkloTransport _transport;
 
-  Future<List<EkkloNutritionPlan>> list() async => decodeList(
-    await _transport.request(
-      HttpMethod.get,
-      _customerPlans,
-      query: const NutritionPlansQuery().toMap(),
-    ),
-    EkkloNutritionPlanMapper.fromMap,
+  Future<List<EkkloNutritionPlan>> list() => _transport.request(
+    HttpMethod.get,
+    _customerPlans,
+    listOf(EkkloNutritionPlanMapper.fromMap),
+    query: const NutritionPlansQuery().toMap(),
   );
 }

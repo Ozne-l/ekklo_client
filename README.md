@@ -90,9 +90,12 @@ Every deliberate error is an `EkkloException`:
 - `EkkloAuthException`: `notSignedIn`, `invalidCredentials`, or
   `sessionExpired` (the session was rejected and has been cleared).
 - `EkkloApiException`: any other error status, with the server's messages.
+- `EkkloNetworkException`: the request never got an answer (no network,
+  DNS, TLS). The session is kept.
+- `EkkloUnexpectedResponseException`: an answer this client cannot read
+  (not JSON, or a missing required field), usually a changed API.
 
-Network failures surface as `http.ClientException`, and a response this
-client cannot decode as a `MapperException`.
+The hierarchy is sealed, so a `switch` over `EkkloException` is exhaustive.
 
 ## Try it
 
