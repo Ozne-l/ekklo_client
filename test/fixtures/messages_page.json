@@ -1,0 +1,125 @@
+{
+  "messages": [
+    {
+      "id": "msg-01",
+      "sender_id": "coach-1",
+      "content": "Bonjour, comment s'est passée la séance ?",
+      "message_type": "text",
+      "internal": false,
+      "created_at": "2026-09-01T08:00:00.123456Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "read_by_other": true,
+      "some_future_key": {"nested": [1, 2]},
+      "reactions": [
+        {"emoji": "🔥", "count": 2, "mine": true, "sample_user_ids": []}
+      ]
+    },
+    {
+      "id": "msg-02",
+      "sender_id": "me-1",
+      "content": "",
+      "message_type": "image",
+      "internal": false,
+      "created_at": "2026-09-01T08:01:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "media_urls": ["global/users/u/message_image/a/b.jpg"]
+    },
+    {
+      "id": "msg-03",
+      "sender_id": "me-1",
+      "content": "Série 2",
+      "message_type": "video",
+      "internal": false,
+      "created_at": "2026-09-01T08:02:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "media_urls": [
+        "https://assets.ekklo.com/ekklo/global/users/u/message_video/a/one.mp4",
+        "https://assets.ekklo.com/ekklo/global/users/u/message_video/a/two.mp4"
+      ]
+    },
+    {
+      "id": "msg-04",
+      "sender_id": "coach-1",
+      "content": "",
+      "message_type": "audio",
+      "internal": false,
+      "created_at": "2026-09-01T08:03:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "media_urls": ["https://assets.ekklo.com/ekklo/global/users/c/message_voice/a/v.m4a"]
+    },
+    {
+      "id": "msg-05",
+      "sender_id": "coach-1",
+      "content": "",
+      "message_type": "voice",
+      "internal": false,
+      "created_at": "2026-09-01T08:04:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "media_urls": ["https://assets.ekklo.com/ekklo/global/users/c/message_voice/a/v.mp4"]
+    },
+    {
+      "id": "msg-06",
+      "sender_id": "me-1",
+      "content": "",
+      "message_type": "mixed",
+      "internal": false,
+      "created_at": "2026-09-01T08:05:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "media_urls": [
+        "https://assets.ekklo.com/ekklo/global/users/u/message_video/a/clip.MP4",
+        "https://assets.ekklo.com/ekklo/global/users/u/message_image/a/photo.jpg"
+      ],
+      "reply_to": {
+        "id": "msg-01",
+        "sender_id": "coach-1",
+        "sender_name": "Coach Test",
+        "content": "Bonjour, comment s'est passée la séance ?",
+        "message_type": "text",
+        "deleted": false
+      }
+    },
+    {
+      "id": "msg-07",
+      "sender_id": "coach-1",
+      "content": "Ton plan de la semaine",
+      "message_type": "text",
+      "internal": false,
+      "created_at": "2026-09-01T08:06:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true,
+      "content_ref": {
+        "type": "nutrition",
+        "title": "Plan",
+        "payload": {"calories": 2100}
+      }
+    },
+    {
+      "id": "msg-08",
+      "sender_id": "coach-1",
+      "content": "",
+      "message_type": "poll",
+      "internal": false,
+      "created_at": "2026-09-01T08:07:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true
+    },
+    {
+      "id": "msg-09",
+      "sender_id": "coach-1",
+      "content": "Note interne",
+      "message_type": "text",
+      "internal": true,
+      "created_at": "2026-09-01T08:08:00Z",
+      "conversation_id": "conv-1",
+      "is_read": true
+    }
+  ],
+  "total": 3,
+  "has_more": true
+}

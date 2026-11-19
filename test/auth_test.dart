@@ -176,6 +176,68 @@ void main() {
     check(await fake.tokenStore.read()).isNull();
   });
 
+  test('a call racing an expiring session also reports it expired, even '
+      'when it starts after the session was cleared', () async {
+    final fake = FakeEkklo({
+      _refresh: (_) => json({
+        'errors': ['invalid token'],
+      }, status: 401),
+      _search: (_) => json({
+        'errors': ['unauthorized'],
+      }, status: 401),
+    });
+    await fake.tokenStore.write(validTokens());
+    final first = fake.client.foods.search('riz');
+    final later = first.then<Object?>(
+      (_) => null,
+      onError: (Object _) => fake.client.foods.search('pâtes'),
+    );
+
+    for (final call in [later, first]) {
+      await check(call).throws<EkkloAuthException>(
+        (e) => e
+            .has((e) => e.failure, 'failure')
+            .equals(EkkloAuthFailure.sessionExpired),
+      );
+    }
+    check(
+      fake.to('POST', '/api/v1/auth/login/refresh_token'),
+    ).length.equals(1);
+  });
+
+  test('a login, or signing out, ends the expired state', () async {
+    final tokens = validTokens(subject: 'second');
+    final fake = FakeEkklo({
+      _login: (_) => json({
+        'access_token': tokens.accessToken,
+        'refresh_token': tokens.refreshToken,
+        'role': 'customer',
+        'first_login': false,
+      }),
+      _refresh: (_) => json({
+        'errors': ['invalid token'],
+      }, status: 401),
+      _search: (request) =>
+          request.headers['authorization'] == 'Bearer ${tokens.accessToken}'
+          ? json([])
+          : json({
+              'errors': ['unauthorized'],
+            }, status: 401),
+    });
+    await fake.tokenStore.write(validTokens());
+    await check(fake.client.foods.search('riz')).throws<EkkloAuthException>();
+
+    await fake.client.login(email: 'me@example.com', password: 'secret');
+    await check(fake.client.foods.search('riz')).completes();
+    await fake.client.clearLocalSession();
+
+    await check(fake.client.foods.search('riz')).throws<EkkloAuthException>(
+      (e) => e
+          .has((e) => e.failure, 'failure')
+          .equals(EkkloAuthFailure.notSignedIn),
+    );
+  });
+
   test('error statuses carry the status and server messages', () async {
     final fake = FakeEkklo({
       'POST /api/v1/nutritions/client/food-items': (_) => json({

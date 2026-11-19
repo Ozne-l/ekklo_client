@@ -1,5 +1,15 @@
 ## Unreleased
 
+- Messaging: the current user's messaging settings, conversations, pages of
+  messages, text, media and voice sends, upload presigning, deletion
+  (`EkkloMessageNotDeletedException` on Ekklo's 500), read marking,
+  reactions, and `EkkloMessagingSocket` for live events. A socket that fails
+  to connect, a connection reset included, is an `EkkloNetworkException`.
+- Once a session expired, calls keep failing with `sessionExpired` (not
+  `notSignedIn`) until the next login, token refresh or
+  `clearLocalSession()`, so concurrent callers agree on why they failed.
+- Requests can carry a timeout; messaging calls use 30 s, 120 s for media.
+- The package now requires `dart:io`.
 - Every failure is now an `EkkloException`. New: `EkkloNetworkException` (was a
   raw `http.ClientException`) and `EkkloUnexpectedResponseException` (was a
   `FormatException` or `MapperException`).

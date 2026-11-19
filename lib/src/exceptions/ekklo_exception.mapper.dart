@@ -245,6 +245,7 @@ class EkkloApiExceptionMapper extends SubClassMapperBase<EkkloApiException> {
       MapperContainer.globals.use(_instance = EkkloApiExceptionMapper._());
       EkkloExceptionMapper.ensureInitialized().addSubMapper(_instance!);
       MapperContainer.globals.useAll([UriMapper()]);
+      EkkloMessageNotDeletedExceptionMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -417,6 +418,213 @@ class _EkkloApiExceptionCopyWithImpl<$R, $Out>
   EkkloApiExceptionCopyWith<$R2, EkkloApiException, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _EkkloApiExceptionCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class EkkloMessageNotDeletedExceptionMapper
+    extends SubClassMapperBase<EkkloMessageNotDeletedException> {
+  EkkloMessageNotDeletedExceptionMapper._();
+
+  static EkkloMessageNotDeletedExceptionMapper? _instance;
+  static EkkloMessageNotDeletedExceptionMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(
+        _instance = EkkloMessageNotDeletedExceptionMapper._(),
+      );
+      EkkloApiExceptionMapper.ensureInitialized().addSubMapper(_instance!);
+      MapperContainer.globals.useAll([UriMapper()]);
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'EkkloMessageNotDeletedException';
+
+  static String _$method(EkkloMessageNotDeletedException v) => v.method;
+  static const Field<EkkloMessageNotDeletedException, String> _f$method = Field(
+    'method',
+    _$method,
+  );
+  static Uri _$uri(EkkloMessageNotDeletedException v) => v.uri;
+  static const Field<EkkloMessageNotDeletedException, Uri> _f$uri = Field(
+    'uri',
+    _$uri,
+  );
+  static int _$statusCode(EkkloMessageNotDeletedException v) => v.statusCode;
+  static const Field<EkkloMessageNotDeletedException, int> _f$statusCode =
+      Field('statusCode', _$statusCode, key: r'status_code');
+  static List<String> _$errors(EkkloMessageNotDeletedException v) => v.errors;
+  static const Field<EkkloMessageNotDeletedException, List<String>> _f$errors =
+      Field('errors', _$errors, opt: true, def: const []);
+
+  @override
+  final MappableFields<EkkloMessageNotDeletedException> fields = const {
+    #method: _f$method,
+    #uri: _f$uri,
+    #statusCode: _f$statusCode,
+    #errors: _f$errors,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'kind';
+  @override
+  final dynamic discriminatorValue = 'EkkloMessageNotDeletedException';
+  @override
+  late final ClassMapperBase superMapper =
+      EkkloApiExceptionMapper.ensureInitialized();
+
+  static EkkloMessageNotDeletedException _instantiate(DecodingData data) {
+    return EkkloMessageNotDeletedException(
+      method: data.dec(_f$method),
+      uri: data.dec(_f$uri),
+      statusCode: data.dec(_f$statusCode),
+      errors: data.dec(_f$errors),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static EkkloMessageNotDeletedException fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<EkkloMessageNotDeletedException>(map);
+  }
+
+  static EkkloMessageNotDeletedException fromJson(String json) {
+    return ensureInitialized().decodeJson<EkkloMessageNotDeletedException>(
+      json,
+    );
+  }
+}
+
+mixin EkkloMessageNotDeletedExceptionMappable {
+  String toJson() {
+    return EkkloMessageNotDeletedExceptionMapper.ensureInitialized()
+        .encodeJson<EkkloMessageNotDeletedException>(
+          this as EkkloMessageNotDeletedException,
+        );
+  }
+
+  Map<String, dynamic> toMap() {
+    return EkkloMessageNotDeletedExceptionMapper.ensureInitialized()
+        .encodeMap<EkkloMessageNotDeletedException>(
+          this as EkkloMessageNotDeletedException,
+        );
+  }
+
+  EkkloMessageNotDeletedExceptionCopyWith<
+    EkkloMessageNotDeletedException,
+    EkkloMessageNotDeletedException,
+    EkkloMessageNotDeletedException
+  >
+  get copyWith =>
+      _EkkloMessageNotDeletedExceptionCopyWithImpl<
+        EkkloMessageNotDeletedException,
+        EkkloMessageNotDeletedException
+      >(this as EkkloMessageNotDeletedException, $identity, $identity);
+  @override
+  String toString() {
+    return EkkloMessageNotDeletedExceptionMapper.ensureInitialized()
+        .stringifyValue(this as EkkloMessageNotDeletedException);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return EkkloMessageNotDeletedExceptionMapper.ensureInitialized()
+        .equalsValue(this as EkkloMessageNotDeletedException, other);
+  }
+
+  @override
+  int get hashCode {
+    return EkkloMessageNotDeletedExceptionMapper.ensureInitialized().hashValue(
+      this as EkkloMessageNotDeletedException,
+    );
+  }
+}
+
+extension EkkloMessageNotDeletedExceptionValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, EkkloMessageNotDeletedException, $Out> {
+  EkkloMessageNotDeletedExceptionCopyWith<
+    $R,
+    EkkloMessageNotDeletedException,
+    $Out
+  >
+  get $asEkkloMessageNotDeletedException => $base.as(
+    (v, t, t2) =>
+        _EkkloMessageNotDeletedExceptionCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class EkkloMessageNotDeletedExceptionCopyWith<
+  $R,
+  $In extends EkkloMessageNotDeletedException,
+  $Out
+>
+    implements EkkloApiExceptionCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get errors;
+  @override
+  $R call({String? method, Uri? uri, int? statusCode, List<String>? errors});
+  EkkloMessageNotDeletedExceptionCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _EkkloMessageNotDeletedExceptionCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, EkkloMessageNotDeletedException, $Out>
+    implements
+        EkkloMessageNotDeletedExceptionCopyWith<
+          $R,
+          EkkloMessageNotDeletedException,
+          $Out
+        > {
+  _EkkloMessageNotDeletedExceptionCopyWithImpl(
+    super.value,
+    super.then,
+    super.then2,
+  );
+
+  @override
+  late final ClassMapperBase<EkkloMessageNotDeletedException> $mapper =
+      EkkloMessageNotDeletedExceptionMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get errors =>
+      ListCopyWith(
+        $value.errors,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(errors: v),
+      );
+  @override
+  $R call({String? method, Uri? uri, int? statusCode, List<String>? errors}) =>
+      $apply(
+        FieldCopyWithData({
+          if (method != null) #method: method,
+          if (uri != null) #uri: uri,
+          if (statusCode != null) #statusCode: statusCode,
+          if (errors != null) #errors: errors,
+        }),
+      );
+  @override
+  EkkloMessageNotDeletedException $make(CopyWithData data) =>
+      EkkloMessageNotDeletedException(
+        method: data.get(#method, or: $value.method),
+        uri: data.get(#uri, or: $value.uri),
+        statusCode: data.get(#statusCode, or: $value.statusCode),
+        errors: data.get(#errors, or: $value.errors),
+      );
+
+  @override
+  EkkloMessageNotDeletedExceptionCopyWith<
+    $R2,
+    EkkloMessageNotDeletedException,
+    $Out2
+  >
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _EkkloMessageNotDeletedExceptionCopyWithImpl<$R2, $Out2>(
+        $value,
+        $cast,
+        t,
+      );
 }
 
 class EkkloNetworkExceptionMapper

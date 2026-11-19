@@ -8,8 +8,9 @@ acting as a **client account** (the person being coached, not the coach).
 > automating your account may go against Ekklo's terms. Use it on your own
 > account, at your own risk, and go easy on their servers.
 
-Pure Dart: works in Flutter apps (iOS, Android, desktop), scripts and servers.
-Not in a browser: the API does not allow cross-origin requests.
+Dart with `dart:io`: works in Flutter apps (iOS, Android, desktop), scripts
+and servers. Not in a browser: the API does not allow cross-origin requests,
+and the messaging socket needs a header only `dart:io` can send.
 
 ## What it covers
 
@@ -20,6 +21,7 @@ Not in a browser: the API does not allow cross-origin requests.
 | Your own foods | `createOwn`, `updateOwn`, `deleteOwn` |
 | Diary | `forDate`, `history`, `appendItems`, `setManualMacros`, `updateItemQuantity`, `removeItem`, `delete` |
 | Coach targets | `nutritionPlans.list` |
+| Messaging | `messaging.me`, `conversations`, `messages`, `sendText`, `sendMedia`, `sendVoice`, `presignUpload`, `deleteMessage`, `markRead`, `addReaction`, `removeReaction`, `connectSocket` |
 
 `updateOwn`, `deleteOwn`, `updateItemQuantity`, `removeItem` and `delete`
 follow the server's published API description; the other calls were checked
@@ -75,6 +77,54 @@ Things the API does that you would not guess:
   favorites; `updateItemQuantity(expectedRevision: meal.revision)` fails
   instead of overwriting a concurrent change.
 
+### Messaging
+
+```dart
+final [conversation] = await ekklo.messaging.conversations();
+var page = await ekklo.messaging.messages(conversation.id);
+while (page.hasMore) {
+  page = await ekklo.messaging.messages(
+    conversation.id,
+    beforeId: page.messages.first.id,
+  );
+}
+
+final socket = await ekklo.messaging.connectSocket();
+socket.focusConversation(conversation.id);
+socket.events.listen((event) => switch (event) {
+  EkkloNewMessage(:final message) => print(message.content),
+  _ => null,
+});
+final closure = await socket.closed;
+```
+
+- **Pages are oldest first.** Pass the first (oldest) message of a page as
+  `beforeId` to get the next older page, until `hasMore` is false. Ekklo's
+  `total` is wrong and not exposed.
+- **What a message shows** is `kind`: `text`, `media` (photos and videos,
+  each in `media` with its kind, a `mixed` message by file extension),
+  `voice` (`audio` and `voice` messages) or `unsupported` (a `content_ref`
+  card or a type this client does not know: show it as "open in Ekklo").
+  `media` resolves bare keys under `https://assets.ekklo.com/ekklo/`.
+  `content` is the text, or the caption of a media message. `internal`
+  messages are meant to be hidden.
+- **`receivedJson`** is the message or conversation exactly as Ekklo sent
+  it, unknown keys included; `EkkloMessageMapper.fromMap` decodes it again.
+- **Media are uploaded first**: `presignUpload`, then a binary `PUT` of the
+  file to `uploadUrl` with its `Content-Type` and no `Authorization`, then
+  `sendMedia` or `sendVoice` with the `publicUrl`. Nothing makes a send
+  idempotent: a send repeated after a lost answer makes two messages.
+- **Timeouts**: 120 s for `sendMedia`, as Ekklo, 30 s for the other
+  messaging calls; a call not answered in time is an
+  `EkkloNetworkException`.
+- **The socket** sends the access token in an `Authorization` header,
+  refreshed first if it is about to expire, to `/api/v1/messaging/ws` on the
+  host of the client's `baseUri` (`ws` for an `http` base). `events` decodes
+  the known server events and drops the others; `closed` completes with the
+  close code when the connection ends, Ekklo's drops included (about every
+  60 s). Reconnecting is up to you. Pass `webSocketConnector` to
+  `EkkloClient` to connect elsewhere, for example in tests.
+
 ### Keeping the session
 
 `EkkloClient` keeps the session in memory unless you pass an
@@ -90,6 +140,9 @@ Every deliberate error is an `EkkloException`:
 - `EkkloAuthException`: `notSignedIn`, `invalidCredentials`, or
   `sessionExpired` (the session was rejected and has been cleared).
 - `EkkloApiException`: any other error status, with the server's messages.
+  Its subtype `EkkloMessageNotDeletedException` is a `deleteMessage`
+  answered with HTTP 500, which Ekklo does for every photo, video and voice
+  message today: the message is still there.
 - `EkkloNetworkException`: the request never got an answer (no network,
   DNS, TLS). The session is kept.
 - `EkkloUnexpectedResponseException`: an answer this client cannot read

@@ -42,9 +42,10 @@ http.Response jsonFixture(String name, {int status = 200}) => http.Response(
 );
 
 final class FakeEkklo {
-  FakeEkklo(this.routes);
+  FakeEkklo(this.routes, {this.webSocketConnector});
 
   final Map<String, Route> routes;
+  final EkkloWebSocketConnector? webSocketConnector;
   final requests = <http.Request>[];
   final tokenStore = InMemoryEkkloTokenStore();
 
@@ -59,6 +60,7 @@ final class FakeEkklo {
     }),
     tokenStore: tokenStore,
     clock: () => now,
+    webSocketConnector: webSocketConnector,
   );
 
   Iterable<http.Request> to(String method, String path) => requests.where(

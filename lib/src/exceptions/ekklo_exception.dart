@@ -35,6 +35,17 @@ final class EkkloApiException extends EkkloException
 }
 
 @MappableClass(includeCustomMappers: [UriMapper()])
+final class EkkloMessageNotDeletedException extends EkkloApiException
+    with EkkloMessageNotDeletedExceptionMappable {
+  const EkkloMessageNotDeletedException({
+    required super.method,
+    required super.uri,
+    required super.statusCode,
+    super.errors,
+  });
+}
+
+@MappableClass(includeCustomMappers: [UriMapper()])
 final class EkkloNetworkException extends EkkloException
     with EkkloNetworkExceptionMappable {
   const EkkloNetworkException({
