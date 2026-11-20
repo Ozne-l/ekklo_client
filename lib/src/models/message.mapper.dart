@@ -75,6 +75,15 @@ class EkkloMessageMapper extends ClassMapperBase<EkkloMessage> {
     opt: true,
     def: false,
   );
+  static bool _$readByOther(EkkloMessage v) => v.readByOther;
+  static const Field<EkkloMessage, bool> _f$readByOther = Field(
+    'readByOther',
+    _$readByOther,
+    key: r'read_by_other',
+    opt: true,
+    def: false,
+    hook: NullToFalseHook(),
+  );
   static EkkloReplyTo? _$replyTo(EkkloMessage v) => v.replyTo;
   static const Field<EkkloMessage, EkkloReplyTo> _f$replyTo = Field(
     'replyTo',
@@ -117,6 +126,7 @@ class EkkloMessageMapper extends ClassMapperBase<EkkloMessage> {
     #content: _f$content,
     #mediaUrls: _f$mediaUrls,
     #internal: _f$internal,
+    #readByOther: _f$readByOther,
     #replyTo: _f$replyTo,
     #reactions: _f$reactions,
     #contentRef: _f$contentRef,
@@ -137,6 +147,7 @@ class EkkloMessageMapper extends ClassMapperBase<EkkloMessage> {
       content: data.dec(_f$content),
       mediaUrls: data.dec(_f$mediaUrls),
       internal: data.dec(_f$internal),
+      readByOther: data.dec(_f$readByOther),
       replyTo: data.dec(_f$replyTo),
       reactions: data.dec(_f$reactions),
       contentRef: data.dec(_f$contentRef),
@@ -227,6 +238,7 @@ abstract class EkkloMessageCopyWith<$R, $In extends EkkloMessage, $Out>
     String? content,
     List<String>? mediaUrls,
     bool? internal,
+    bool? readByOther,
     EkkloReplyTo? replyTo,
     List<EkkloReaction>? reactions,
     Map<String, dynamic>? contentRef,
@@ -290,6 +302,7 @@ class _EkkloMessageCopyWithImpl<$R, $Out>
     String? content,
     List<String>? mediaUrls,
     bool? internal,
+    bool? readByOther,
     Object? replyTo = $none,
     List<EkkloReaction>? reactions,
     Object? contentRef = $none,
@@ -304,6 +317,7 @@ class _EkkloMessageCopyWithImpl<$R, $Out>
       if (content != null) #content: content,
       if (mediaUrls != null) #mediaUrls: mediaUrls,
       if (internal != null) #internal: internal,
+      if (readByOther != null) #readByOther: readByOther,
       if (replyTo != $none) #replyTo: replyTo,
       if (reactions != null) #reactions: reactions,
       if (contentRef != $none) #contentRef: contentRef,
@@ -320,6 +334,7 @@ class _EkkloMessageCopyWithImpl<$R, $Out>
     content: data.get(#content, or: $value.content),
     mediaUrls: data.get(#mediaUrls, or: $value.mediaUrls),
     internal: data.get(#internal, or: $value.internal),
+    readByOther: data.get(#readByOther, or: $value.readByOther),
     replyTo: data.get(#replyTo, or: $value.replyTo),
     reactions: data.get(#reactions, or: $value.reactions),
     contentRef: data.get(#contentRef, or: $value.contentRef),

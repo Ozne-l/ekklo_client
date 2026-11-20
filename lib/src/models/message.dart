@@ -20,6 +20,7 @@ class EkkloMessage with EkkloMessageMappable {
     this.content = '',
     this.mediaUrls = const [],
     this.internal = false,
+    this.readByOther = false,
     this.replyTo,
     this.reactions = const [],
     this.contentRef,
@@ -44,6 +45,10 @@ class EkkloMessage with EkkloMessageMappable {
   final List<String> mediaUrls;
 
   final bool internal;
+
+  @MappableField(hook: NullToFalseHook())
+  final bool readByOther;
+
   final EkkloReplyTo? replyTo;
 
   @MappableField(hook: NullToEmptyListHook())

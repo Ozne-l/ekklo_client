@@ -192,6 +192,19 @@ void main() {
       check(byId('msg-09').internal).isTrue();
     });
 
+    test('tells whether the other side read a message, unread when the key '
+        'is null or missing', () {
+      check({
+        for (final id in ['msg-01', 'msg-02', 'msg-03', 'msg-04'])
+          id: byId(id).readByOther,
+      }).deepEquals({
+        'msg-01': true,
+        'msg-02': false,
+        'msg-03': false,
+        'msg-04': false,
+      });
+    });
+
     test('keeps each message as received, decodable again', () {
       final {'messages': List<Object?> received} =
           jsonDecode(fixture('messages_page.json')) as Map<String, dynamic>;

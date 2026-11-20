@@ -1,5 +1,7 @@
 ## Unreleased
 
+- `EkkloMessage.readByOther` (`read_by_other`): whether the other side of the
+  conversation read the message; `false` when the key is null or missing.
 - Messaging: the current user's messaging settings, conversations, pages of
   messages, text, media and voice sends, upload presigning, deletion
   (`EkkloMessageNotDeletedException` on Ekklo's 500), read marking,

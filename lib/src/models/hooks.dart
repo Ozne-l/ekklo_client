@@ -14,6 +14,13 @@ class NullToEmptyStringHook extends MappingHook {
   Object? beforeDecode(Object? value) => value ?? '';
 }
 
+class NullToFalseHook extends MappingHook {
+  const NullToFalseHook();
+
+  @override
+  Object? beforeDecode(Object? value) => value ?? false;
+}
+
 class CalendarDateHook extends MappingHook {
   const CalendarDateHook();
 
